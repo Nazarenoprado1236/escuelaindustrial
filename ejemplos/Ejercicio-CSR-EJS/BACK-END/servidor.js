@@ -38,4 +38,5 @@ app.get('/imagen/:id', (req, res) => {
     
     // Send the image file
     res.sendFile(imagePath);
+    node servidor.js
   });
