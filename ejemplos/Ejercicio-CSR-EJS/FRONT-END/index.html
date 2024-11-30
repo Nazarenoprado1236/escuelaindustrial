@@ -1,8 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+      import React, { useState } from 'react';
+import axios from 'axios';
+
+const CrearUsuario = () => {
+  const [correo, setCorreo] = useState('');
+
+  const crearUsuario = () => {
+    axios.post('http://localhost:5000/api/usuarios', { correo })
+      .then(response => alert('Usuario creado con éxito!'))
+      .catch(error => alert('Error al crear usuario'));
+  };
+
+  return (
+    <div>
+      <h1>Crear Usuario: nazarenoprado</h1>
+      <input 
+        type="email" 
+        value={correo} 
+        onChange={(e) => setCorreo(e.target.value)} 
+        placeholder="Correo electrónico"
+      />
+      <button onClick={crearUsuario}>Crear Usuario</button>
+    </div>
+  );
+};
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const ListarUsuarios = () => {
+  const [usuarios, setUsuarios] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/usuarios')
+      .then(response => setUsuarios(response.data))
+      .catch(error => console.error(error));
+  }, []);
+
+  return (
+    <div>
+      <h1>Lista de Usuarios</h1>
+      <ul>
+        {usuarios.map(usuario => (
+          <li key={usuario.id}>{usuario.nombre} - {usuario.correo}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default ListarUsuarios;
+export default CrearUsuario;
+
+     
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <h1>Bienvenido a la aplicación de nazarenoprado</h1>
+    
     <title>EJS Client-Side Rendering</title>
     <!-- Include EJS library for client-side rendering -->
     <script src="https://cdn.jsdelivr.net/npm/ejs@3.1.6/ejs.min.js"></script>
