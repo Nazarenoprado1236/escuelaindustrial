@@ -38,4 +38,27 @@ app.get('/imagen/:id', (req, res) => {
     
     // Send the image file
     res.sendFile(imagePath);
+app.get('/api/horarios', (req, res) => {
+
+  res.json({ nombre: 'nazarenoprado', actividad: 'Yoga', hora: '10:00 AM' });
+});
+
+const usuarios = [];
+
+app.post('/api/usuarios', (req, res) => {
+  const usuario = {
+    id: usuarios.length + 1,
+    nombre: 'nazarenoprado',
+    correo: req.body.correo,
+  };
+  usuarios.push(usuario);
+  res.status(201).json(usuario);
+});
+
+app.get('/api/usuarios', (req, res) => {
+  res.json(usuarios);
+});
+node servidor.js
+
+
   });
