@@ -1,97 +1,140 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EJS Client-Side Rendering</title>
-    <!-- Include EJS library for client-side rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/ejs@3.1.6/ejs.min.js"></script>
-  </head>
-  <body>
-    <h1>EJS Client-Side Rendering</h1>
+    <title>Aplicación de Nazareno Prado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1em 0;
+            text-align: center;
+        }
+        main {
+            padding: 2em;
+        }
+        section {
+            margin-bottom: 2em;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+            margin-top: 2em;
+        }
+        .form-group {
+            margin-bottom: 1em;
+        }
+        input, button {
+            padding: 0.5em;
+            font-size: 1em;
+            margin-top: 0.5em;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #fff;
+            margin: 0.5em 0;
+            padding: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bienvenido a la aplicación de Nazareno Prado</h1>
+        <p>¡Administra tus usuarios de manera eficiente y rápida!</p>
+    </header>
 
-    <!-- Placeholder where the rendered template will be injected -->
-    <h2>contenido servidor local</h2>
-    <div id="content"></div>
+    <main>
+        <!-- Sección para crear un usuario -->
+        <section>
+            <h2>Crear Usuario</h2>
+            <form id="formCrearUsuario">
+                <div class="form-group">
+                    <label for="correo">Correo electrónico:</label>
+                    <input 
+                        type="email" 
+                        name="correo" 
+                        id="correo" 
+                        placeholder="Ingrese un correo" 
+                        required 
+                    />
+                </div>
+                <button type="submit">Crear Usuario</button>
+            </form>
+            <p id="mensaje"></p>
+        </section>
 
-    <h2>contenido del servidor REMOTO</h2>
-    <div id="contentServer"></div>
+        <!-- Sección para listar usuarios -->
+        <section>
+            <h2>Lista de Usuarios</h2>
+            <ul id="listaUsuarios">
+                <% if (usuarios && usuarios.length > 0) { %>
+                    <% usuarios.forEach(usuario => { %>
+                        <li><strong><%= usuario.nombre %></strong> - <%= usuario.correo %></li>
+                    <% }) %>
+                <% } else { %>
+                    <li>No hay usuarios disponibles.</li>
+                <% } %>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Nazareno Prado. Todos los derechos reservados.</p>
+    </footer>
+
     <script>
-      // Sample data to render
-      const data = [
-        {
-          name: "Alicia",
-          age: 25,
-          imagen: "http://localhost:3000/imagen/1",
-          telefono: 12312,
-        },
-        {
-          name: "Bruno",
-          age: 30,
-          imagen: "http://localhost:3000/imagen/2",
-          telefono: 55555,
-        },
-        {
-          name: "Carlitos",
-          age: 35,
-          imagen:
-            "https://resizer.glanacion.com/resizer/v2/homero-simpson-es-un-amante-declarado-de-las-XO5SSLZVMJG4HFBYZYH6FBBV6Q.jpg?auth=b3b4aa72e1f1c8d359c4e395730b9e6cf33858d60624b480213641fd5e836198&width=1200&quality=70&smart=false&height=720",
-          telefono: 67776,
-        },
-      ];
+        // Manejar el envío del formulario para crear un usuario
+        document.getElementById('formCrearUsuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const correo = document.getElementById('correo').value;
 
-      // Function to load the external EJS template
-      async function loadTemplate(url) {
-        const response = await fetch(url);
-        const template = await response.text();
-        return template;
-      }
+            try {
+                const response = await fetch('/api/usuarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ correo })
+                });
 
-      // Load the EJS template from an external file
-      /*loadTemplate("template.ejs")
-        .then((template) => {
-          // Render the template with the data
-          const renderedHtml = ejs.render(template, { data: data });
-
-          // Insert the rendered HTML into the content div
-          document.getElementById("content").innerHTML = renderedHtml;
-        })
-        .catch((error) => {
-          console.error("Error loading template:", error);
+                if (response.ok) {
+                    document.getElementById('mensaje').innerText = '¡Usuario creado con éxito!';
+                    document.getElementById('correo').value = '';
+                    location.reload(); // Recargar la lista de usuarios
+                } else {
+                    document.getElementById('mensaje').innerText = 'Error al crear usuario';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('mensaje').innerText = 'Error al conectar con el servidor';
+            }
         });
-*/
-
-      async function loadFromServer() {
-        // Load the EJS template from an external file
-        const template2 = await loadTemplate("template.ejs");
-        console.log(template2);
-        const dataServer = await loadTemplate("http://localhost:3000/data");
-        console.log(dataServer);
-
-        const renderedHtml2 = ejs.render(template2, {
-          data: JSON.parse(dataServer),
-        });
-        // Insert the rendered HTML into the content div
-        document.getElementById("contentServer").innerHTML = renderedHtml2;
-      }
-
-      loadFromServer();
-
-      /*async function loadFromClient() {
-        // Load the EJS template from an external file
-        const template2 = await loadTemplate("template.ejs");
-        console.log(template2);
-        const dataServer = data; //await loadTemplate("http://localhost:3000/data");
-        console.log(dataServer);
-
-        const renderedHtml2 = ejs.render(template2, {
-          data: dataServer,
-        });
-        // Insert the rendered HTML into the content div
-        document.getElementById("contentServer").innerHTML = renderedHtml2;
-      }
-
-      loadFromClient();*/
     </script>
-  </body>
-</html>
+</body>
+  </html>
+  
